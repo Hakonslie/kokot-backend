@@ -15,7 +15,7 @@ import (
 const address = "http://localhost:5050/kokots/v1"
 
 func TestApp(t *testing.T) {
-	go App("5050")
+	c := runAppWithChannel()
 	r, err := http.Get(address)
 	require.NoError(t, err)
 	require.Equal(t, r.StatusCode, 200)
@@ -25,11 +25,11 @@ func TestApp(t *testing.T) {
 	err = json.Unmarshal(b, &ks)
 	require.NoError(t, err)
 	require.ElementsMatch(t, ks, make([]kokots.Kokot, 0))
+	c <- 0
 }
 
 func TestAddAndGet(t *testing.T) {
-	go App("5050")
-
+	c := runAppWithChannel()
 	res, err := testHelperAddKokot(address, "Louis Litt")
 	require.NoError(t, err)
 	require.Equal(t, "Louis Litt", res.Name)
@@ -38,10 +38,11 @@ func TestAddAndGet(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "Louis Litt", res.Name)
 
+	c <- 0
 }
 
 func TestIsEmpty(t *testing.T) {
-	go App("5050")
+	c := runAppWithChannel()
 	r, err := http.Get(address)
 	require.NoError(t, err)
 	b, err := io.ReadAll(r.Body)
@@ -52,10 +53,12 @@ func TestIsEmpty(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, 0, len(kokts))
+
+	c <- 0
 }
 
 func TestAddMultiple(t *testing.T) {
-	go App("5050")
+	c := runAppWithChannel()
 	for i := 0; i < 10; i++ {
 		newKokot := strconv.Itoa(rand.Int())
 		_, err := testHelperAddKokot(address, newKokot)
@@ -70,10 +73,11 @@ func TestAddMultiple(t *testing.T) {
 	json.Unmarshal(b, &kokts)
 
 	require.Equal(t, 10, len(kokts))
+	c <- 0
 }
 
 func TestUpdate(t *testing.T) {
-	go App("5050")
+	c := runAppWithChannel()
 
 	res, err := testHelperAddKokot(address, "Louis Litt")
 	require.NoError(t, err)
@@ -90,10 +94,11 @@ func TestUpdate(t *testing.T) {
 	res, err = testHelperGetKokot(address, res.ID)
 	require.NoError(t, err)
 	require.Equal(t, "Louis Hitt", res.Name)
+	c <- 0
 }
 
 func TestDelete(t *testing.T) {
-	go App("5050")
+	c := runAppWithChannel()
 
 	res, err := testHelperAddKokot(address, "Louis Litt")
 	require.NoError(t, err)
@@ -107,5 +112,5 @@ func TestDelete(t *testing.T) {
 	require.Equal(t, err.Error(), "Wrong status code")
 	require.Error(t, err)
 	require.Empty(t, res)
-
+	c <- 0
 }

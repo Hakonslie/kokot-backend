@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -32,22 +33,37 @@ func handler(kokotController kokots.KokotController) http.HandlerFunc {
 	}
 }
 
-func initalize() *mux.Router {
-	log.Println("initalizing...")
+func initialize(port string) *http.Server {
+	log.Println("initializing...")
 	kokotController := kokots.NewKokotController()
+
 	m := mux.NewRouter()
 	m.Handle("/kokots/v1", handler(kokotController)).Methods(http.MethodGet, http.MethodPost)
 	m.Handle("/kokots/v1/{id}", handler(kokotController)).Methods(http.MethodGet, http.MethodPut, http.MethodDelete)
-	return m
+
+	srv := http.Server{
+		Addr:    ":" + port,
+		Handler: m,
+	}
+	return &srv
 }
 
-func run(router *mux.Router, port string) {
-	log.Printf("Running on %s\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
+func Run(port string, c chan int) {
+	srv := initialize(port)
+	go srv.ListenAndServe()
+	for {
+		select {
+		case <-c:
+			srv.Shutdown(context.Background())
+			return
+		}
+	}
 }
-func App(port string) {
-	run(initalize(), port)
+func Frontend(port string, c chan int) {
+
 }
 func main() {
-	App("5050")
+	c := make(chan int)
+	Run("5050", c)
+
 }

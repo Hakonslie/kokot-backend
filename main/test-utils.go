@@ -7,7 +7,16 @@ import (
 	"io"
 	"net/http"
 	"restful/kokots"
+	"time"
 )
+
+func runAppWithChannel() chan int {
+	// Sleep to give time for the channel and server to close in between tests
+	time.Sleep(time.Second / 4)
+	c := make(chan int)
+	go Run("5050", c)
+	return c
+}
 
 func testHelperAddKokot(address, name string) (kokots.Kokot, error) {
 	nkj, err := json.Marshal(name)
