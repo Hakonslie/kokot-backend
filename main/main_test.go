@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/stretchr/testify/require"
 	"io"
 	"math/rand"
@@ -70,9 +69,6 @@ func TestAddMultiple(t *testing.T) {
 	var kokts []kokots.Kokot
 	json.Unmarshal(b, &kokts)
 
-	for _, v := range kokts {
-		fmt.Println(v.ID)
-	}
 	require.Equal(t, 10, len(kokts))
 }
 
