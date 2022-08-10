@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>The Kokot Registry(TKR)</title>
+    <style>
+        .name {
+           border: 0;
+           border-bottom: 1px dashed;
+        }
+        .name:focus {
+            border: 0;
+            color: red
+        }
+        .name:hover {
+            background-color: antiquewhite;
+        }
+    </style>
+</head>
+<body style="background-color: #5456bb">
+<div style="width:70%; display: block; margin-left:auto; margin-right: auto; margin-top: 10%; border: 1px solid grey; padding: 5%; padding-top:1%; background-color: white">
+    Hello? Do you know a Kokot?
+    <hr>
+    {{range .AllKokots }}
+    <table><tr><td>
+        <form method="post">
+            <input class="name" type="text" value="{{.Name}}" name="name">
+            <input type="hidden" name="action" value="put" />
+            <input type="hidden" name="id" value="{{.ID}}" />
+            <input type="submit" value="change">
+        </form>
+    </td><td>
+        <form method="post">
+            <input type="hidden" name="action" value="delete" />
+            <input type="hidden" name="id" value="{{.ID}}" />
+            <input type="submit" value="remove">
+        </form></td></tr></table>
+    {{end}}
+    <hr>
+    <form method="post">
+        <label for="addName">Add kokot:</label>
+        <input type="hidden" name="action" value="add" />
+        <input type="text" id="addName" name="name" placeholder="name"/>
+        <input type="submit" value="add" />
+    </form>
+</div>
+<body>
+</html>

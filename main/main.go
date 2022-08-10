@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"restful/handlers"
 	"restful/kokots"
+	"restful/pages"
 )
 
 func handler(kokotController kokots.KokotController) http.HandlerFunc {
@@ -34,7 +36,7 @@ func handler(kokotController kokots.KokotController) http.HandlerFunc {
 }
 
 func initialize(port string) *http.Server {
-	log.Println("initializing...")
+	log.Println("Initializing backend...")
 	kokotController := kokots.NewKokotController()
 
 	m := mux.NewRouter()
@@ -47,20 +49,32 @@ func initialize(port string) *http.Server {
 	}
 	return &srv
 }
+func initializeFrontend(port string) *http.Server {
+	log.Println("Initializing frontend...")
+	m := mux.NewRouter()
+	m.Handle("/", pages.Router()).Methods(http.MethodGet, http.MethodPost)
+	srv := http.Server{
+		Addr:    ":" + port,
+		Handler: m,
+	}
+	return &srv
+}
 
 func Run(port string, c chan int) {
 	srv := initialize(port)
+	frt := initializeFrontend("4040")
 	go srv.ListenAndServe()
+	fmt.Println("Backend running.")
+	go frt.ListenAndServe()
+	fmt.Println("Frontend running.")
 	for {
 		select {
 		case <-c:
+			frt.Shutdown(context.Background())
 			srv.Shutdown(context.Background())
 			return
 		}
 	}
-}
-func Frontend(port string, c chan int) {
-
 }
 func main() {
 	c := make(chan int)

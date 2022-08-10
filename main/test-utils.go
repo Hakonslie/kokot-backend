@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"restful/kokots"
@@ -20,6 +21,7 @@ func runAppWithChannel() chan int {
 
 func testHelperAddKokot(address, name string) (kokots.Kokot, error) {
 	nkj, err := json.Marshal(name)
+	fmt.Println(string(nkj))
 	if err != nil {
 		return kokots.Kokot{}, err
 	}

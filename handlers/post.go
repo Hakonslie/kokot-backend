@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"restful/kokots"
@@ -17,6 +18,8 @@ func Post(k kokots.KokotController, w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(b, &name)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(string(b))
+		fmt.Println(err)
 		return
 	}
 	// doesn't exist. Create new

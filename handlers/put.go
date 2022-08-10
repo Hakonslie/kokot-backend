@@ -7,7 +7,7 @@ import (
 	"restful/kokots"
 )
 
-// Put Updates a current kokot or creates new if no id present. Returns Kokot
+// Put Updates a current kokot. Returns Kokot
 func Put(k kokots.KokotController, w http.ResponseWriter, r *http.Request) {
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
