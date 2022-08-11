@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"restful/kokots"
 	"strings"
@@ -12,7 +11,6 @@ import (
 
 func Router() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("incoming %s request: %v\n", r.Method, r.URL)
 		switch r.Method {
 		case http.MethodGet:
 			if r.URL.String() == "/" {
@@ -64,13 +62,7 @@ func Router() http.HandlerFunc {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				id, err := json.Marshal(r.FormValue("id"))
-				if err != nil {
-					w.WriteHeader(http.StatusInternalServerError)
-					return
-				}
-				cleaned := strings.Replace(string(id), "\"", "", -1)
-				req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("http://localhost:5050/kokots/v1/%s", cleaned), bytes.NewReader(bod))
+				req, err := http.NewRequest(http.MethodPut, fmt.Sprintf("http://localhost:5050/kokots/v1"), bytes.NewReader(bod))
 				if err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
 					return
